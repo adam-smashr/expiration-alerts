@@ -1,31 +1,20 @@
 import pandas as pd
-from datetime import date
-from lib import days_left, format_datetime, is_expired
+from lib import days_left, format_datetime, is_expired, generate_report
+from logger import get_credentials, create_logger
 
 
-TODAYS_DATE = date.today()
+def main() -> None:
 
+    creds = get_credentials("credentials.yaml")
+    logger = create_logger(creds)
 
-def main():
+    df = pd.read_excel(io="food_items.xlsx")
 
-    df = pd.read_excel(
-        io="fridge_items.xlsx",
-        dtype={
-            "Name": "string",
-            "Notes": "string",
-        },
-        converters={"Expiration Date": format_datetime},
-    )
+    df["Expiration Date"] = df["Expiration Date"].apply(format_datetime)
+    df["Is Expired"] = df["Expiration Date"].apply(is_expired)
+    df["Days Left"] = df["Expiration Date"].apply(days_left)
 
-    df["Is Expired"] = [
-        is_expired(expiration_date) for expiration_date in df["Expiration Date"]
-    ]
-
-    df["Days Left"] = [
-        days_left(expiration_date) for expiration_date in df["Expiration Date"]
-    ]
-
-    print(df.to_string())
+    logger.info(generate_report(df))
 
 
 if __name__ == "__main__":
