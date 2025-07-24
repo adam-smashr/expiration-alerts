@@ -39,10 +39,17 @@ def create_logger(creds: Credentials) -> logging.Logger:
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
+    # log file
     file_handler = logging.FileHandler("output.log", mode="w")
     file_handler.setLevel(logging.INFO)
     logger.addHandler(file_handler)
 
+    # console logging
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    logger.addHandler(console_handler)
+
+    # email logging
     email_handler = logging.handlers.SMTPHandler(
         mailhost=(creds["server"], creds["port"]),
         fromaddr=creds["from_addr"],
@@ -51,7 +58,7 @@ def create_logger(creds: Credentials) -> logging.Logger:
         credentials=(creds["username"], creds["password"]),
         secure=(),
     )
-    email_handler.setLevel(logging.INFO)
+    email_handler.setLevel(logging.ERROR)
     logger.addHandler(email_handler)
 
     return logger

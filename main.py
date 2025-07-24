@@ -14,7 +14,7 @@ def main() -> None:
     df["Is Expired"] = df["Expiration Date"].apply(is_expired)
     df["Days Left"] = df["Expiration Date"].apply(days_left)
 
-    logger.info(generate_report(df))
+    logger.error(generate_report(df, "grid"))
 
 
 if __name__ == "__main__":
