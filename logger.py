@@ -6,6 +6,7 @@ from typing import TypedDict
 
 class Credentials(TypedDict):
     server: str
+    port: int
     from_addr: str
     to_addr: str
     username: str
@@ -18,6 +19,7 @@ def get_credentials(file_path) -> Credentials:
 
         return Credentials(
             server=yaml_cfg["server"],
+            port=yaml_cfg["port"],
             from_addr=yaml_cfg["from_addr"],
             to_addr=yaml_cfg["to_addr"],
             username=yaml_cfg["username"],
@@ -42,11 +44,12 @@ def create_logger(creds: Credentials) -> logging.Logger:
     logger.addHandler(file_handler)
 
     email_handler = logging.handlers.SMTPHandler(
-        mailhost=creds["server"],  # TODO: add port to mailhost param
+        mailhost=(creds["server"], creds["port"]),
         fromaddr=creds["from_addr"],
-        toaddrs=creds["to_addr"],
+        toaddrs=[creds["to_addr"]],
         subject="Freshness Report",
         credentials=(creds["username"], creds["password"]),
+        secure=(),
     )
     email_handler.setLevel(logging.INFO)
     logger.addHandler(email_handler)
