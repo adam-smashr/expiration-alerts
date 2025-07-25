@@ -25,7 +25,7 @@ class AppConfig:
     subject: str
 
 
-def get_app_config(file_path) -> AppConfig:
+def get_app_config(file_path: str) -> AppConfig:
     with open(file_path, "r") as f:
         try:
             yaml_cfg: dict[str, str | int] = yaml.load(f, Loader=yaml.SafeLoader)
@@ -64,7 +64,7 @@ def get_app_config(file_path) -> AppConfig:
 
 def setup_server(cfg: AppConfig) -> SMTP:
     logger.debug("connecting to server...")
-    s = SMTP(cfg.server)
+    s = SMTP(cfg.server, cfg.port)
     s.starttls()
     s.login(cfg.username, cfg.password)
 
@@ -81,9 +81,9 @@ def format_message(cfg: AppConfig, content: str) -> EmailMessage:
     return email
 
 
-def send_email(cfg: AppConfig) -> None:
+def send_email(cfg: AppConfig, content: str) -> None:
     logger.debug("preparing email...")
-    message = format_message(cfg, content="hello")
+    message = format_message(cfg, content=content)
     server = setup_server(cfg)
 
     logger.debug("sending message...")
@@ -95,4 +95,5 @@ def send_email(cfg: AppConfig) -> None:
 
 if __name__ == "__main__":
     cfg = get_app_config("credentials.yaml")
-    send_email(cfg=cfg)
+    # Replace 'Your email content here' with the actual content you want to send
+    send_email(cfg=cfg, content="Your email content here")
